@@ -1,48 +1,36 @@
 #!/bin/bash
 $1
-package='Foo'
+package='EnrichmentBrowser'
 cd $package
 
+LITE_CALL="biocLite"
+BIOC_PKG="BiocInstaller"
 SOURCE_FILES=".*\.[Rr]?[DdNnMmWw]*$"
+BIOC_MGR="if (!requireNamespace(\"BiocManager\", quietly=TRUE))\\
+    \1install.packages(\"BiocManager\")"
 
-files=`find . ! -path . -regex "$SOURCE_FILES"`
+SOURCE_LINE_REGEXP="^(\s*)source\(.*http.*/$LITE_CALL\.R.*\)\s*$"
+LIBRARY_LINE_REGEXP="^\s*library\(.*$BIOC_PKG.*\)\s*$"
+BIOCLITE_CALL_REGEXP="^\s*$LITE_CALL\(.*$package.*\)\s*$"
 
-hit_files=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
+library_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
 
-for i in $hit_files;
+for i in $library_hits;
 do
     sed -i "s/\<$BIOC_PKG\>/BiocManager/" $i
 done
 
-cd ~/
-BIOC_PKG="BiocInstaller"
-LITE_CALL="biocLite"
+source_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$SOURCE_LINE_REGEXP" {} \+`
 
-LIBRARY_LINE_REGEXP="^\s*library\(.?$BIOC_PKG.?\)\s*$"
+for i in $source_hits;
+do
+    sed -E -i "s|$SOURCE_LINE_REGEXP|\1$BIOC_MGR|" $i
+done
 
-SOURCE_LINE_REGEXP="^\s*source\(.?http.*/$LITE_CALL\.R.?\)\s*$"
+biocLite_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$BIOCLITE_CALL_REGEXP" {} \+`
 
-BIOCLITE_CALL_REGEXP="^\s*$LITE_CALL\(.*$package.*\)\s*$"
+for i in $biocLite_hits;
+do
+    sed -i "s/\<$LITE_CALL\>/install/" $i
+done
 
-## for every file in files
-old_library_line=`grep -E $LIBRARY_LINE_REGEXP ~/test/test_calls.txt`
-old_source_line=`grep -E $SOURCE_LINE_REGEXP ~/test/test_calls.txt`
-old_bioclite_line=`grep -E $BIOCLITE_CALL_REGEXP ~/test/test_calls.txt`
-
-#test
-old_library_line='library("BiocInstaller")'
-
-echo $old_library_line | sed "s/\<$BIOC_PKG\>/BiocManager/"
-
-#test
-old_source_line='source("https://bioconductor.org/biocLite.R")'
-
-biocmanager="if (!requireNamespace(\"BiocManager\"))\\
-    install.packages(\"BiocManager\")"
-
-echo $old_source_line | sed "s|${old_source_line}|${biocmanager}|"
-
-#test
-old_bioclite_line='biocLite("Foo")'
-
-echo $old_bioclite_line | sed "s/\<$LITE_CALL\>/install/"
