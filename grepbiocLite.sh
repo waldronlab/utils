@@ -1,6 +1,6 @@
 #!/bin/bash
 $1
-package='EnrichmentBrowser'
+package='splatter'
 cd $package
 
 LITE_CALL="biocLite"
