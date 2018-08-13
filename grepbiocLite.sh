@@ -6,10 +6,10 @@ cd $package
 LITE_CALL="biocLite"
 BIOC_PKG="BiocInstaller"
 SOURCE_FILES=".*\.[Rr]?[DdNnMmWw]*$"
-BIOC_MGR="if (!requireNamespace(\"BiocManager\", quietly=TRUE))\\
-    \1install.packages(\"BiocManager\")"
+BIOC_MGR="\2if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
+    \1\2install.packages(\"BiocManager\")\2"
 
-SOURCE_LINE_REGEXP="^(\s*)source\(.*http.*/$LITE_CALL\.R.*\)\s*$"
+SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*/$LITE_CALL\.R.*\)\`*\s*$"
 LIBRARY_LINE_REGEXP="^\s*library\(.*$BIOC_PKG.*\)\s*$"
 BIOCLITE_CALL_REGEXP="^\s*$LITE_CALL\(.*$package.*\)\s*$"
 
@@ -31,6 +31,6 @@ biocLite_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$BIOCLITE
 
 for i in $biocLite_hits;
 do
-    sed -i "s/\<$LITE_CALL\>/install/" $i
+    sed -i "s/\<$LITE_CALL\>/BiocManager::install/" $i
 done
 
