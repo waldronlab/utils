@@ -6,7 +6,7 @@ cd $package
 LITE_CALL="biocLite"
 BIOC_PKG="BiocInstaller"
 SOURCE_FILES=".*\.[Rr]?[DdNnMmWw]*$"
-BIOC_MGR="\2if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
+BIOC_MGR="\1\2if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
     \1\2install.packages(\"BiocManager\")\2"
 
 SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*/$LITE_CALL\.R.*\)\`*\s*$"
@@ -24,7 +24,7 @@ source_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$SOURCE_LIN
 
 for i in $source_hits;
 do
-    sed -E -i "s|$SOURCE_LINE_REGEXP|\1$BIOC_MGR|" $i
+    sed -E -i "s|$SOURCE_LINE_REGEXP|$BIOC_MGR|" $i
 done
 
 biocLite_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$BIOCLITE_CALL_REGEXP" {} \+`
