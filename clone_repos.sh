@@ -3,9 +3,9 @@
 # eval "$(ssh-agent -s)"
 # ssh-add
 
-export BBS_HOME="/path/to/Bioconductor/BBS"
+export BBS_HOME="/data/16tb/Bioconductor/BBS"
 export PYTHONPATH="$BBS_HOME/bbs"
-export BIOC="/path/to/Bioconductor/"
+export BIOC="/data/16tb/Bioconductor/"
 
 cd $BIOC
 

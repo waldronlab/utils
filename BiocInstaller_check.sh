@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BIOC="/path/to/Bioconductor/"
+BIOC="/data/16tb/Bioconductor/"
 
 pkg_type=( 'software' 'data-experiment' 'workflows' )
 folder='44cc844a169d5d96c777a69037dae653'
