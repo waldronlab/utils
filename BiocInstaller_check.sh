@@ -3,18 +3,19 @@
 BIOC="/path/to/Bioconductor/"
 
 pkg_type=( 'software' 'data-experiment' 'workflows' )
-folder='grepOut'
+folder='44cc844a169d5d96c777a69037dae653'
 
 for i in ${pkg_type[@]}
 do
-    cd $BIOC/git.bioconductor.org/$i
-
+    locate=$BIOC/git.bioconductor.org/$i
+    cd $locate
+    echo $locate
     ## Among all Bioconductor packages, what PACKAGES mention 'BiocInstaller' or 'biocLite'?
     find . -type f -print0 | xargs -0 grep -E --exclude-dir={.git,data} \
     --exclude={\.[Rr][Dd][AaSs],.R[Dd]ata} 'BiocInstaller|biocLite' | \
     cut -d/ -f2 | sort | uniq > $BIOC/$folder/${i}_BiocInstaller_biocLite_PKGS.txt
 
-if [ "$i" = 'software']
+if [ "$i" = 'software' ]
 then
     ## Among all Bioc dev-team packages, what PACKAGES contain 'BiocInstaller'?
     cat /home/$USER/Bioconductor/GitContribution/inst/extdata/packages_maintained_by_bioc.txt | \
