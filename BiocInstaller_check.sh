@@ -10,18 +10,21 @@ do
     locate=$BIOC/git.bioconductor.org/$i
     cd $locate
     echo $locate
-    ## Among all Bioconductor packages, what PACKAGES mention 'BiocInstaller' or 'biocLite'?
+    ## Among all Bioconductor packages, what PACKAGES mention 'BiocInstaller'
+    ## or 'biocLite'?
     find . -type f -print0 | xargs -0 grep -E --exclude-dir={.git,data} \
-    --exclude={\.[Rr][Dd][AaSs],.R[Dd]ata} 'BiocInstaller|biocLite' | \
-    cut -d/ -f2 | sort | uniq > $BIOC/$folder/${i}_BiocInstaller_biocLite_PKGS.txt
+    --exclude={\.[Rr][Dd][AaSs],.[Rr][Dd]ata} 'BiocInstaller|biocLite' | \
+    cut -d/ -f2 | sort | \
+    uniq > $BIOC/$folder/${i}_BiocInstaller_biocLite_PKGS.txt
 
 if [ "$i" = 'software' ]
 then
     ## Among all Bioc dev-team packages, what PACKAGES contain 'BiocInstaller'?
     cat /home/$USER/Bioconductor/GitContribution/inst/extdata/packages_maintained_by_bioc.txt | \
-    xargs grep -Er --exclude-dir={.git,data} 'BiocInstaller|biocLite' | cut -d/ -f1 | sort | uniq \
-    > $BIOC/$folder/${i}_BiocMaintained_PKGS.txt
+    xargs grep -Er --exclude-dir={.git,data} 'BiocInstaller|biocLite' | \
+    cut -d/ -f1 | sort | uniq > $BIOC/$folder/${i}_BiocMaintained_PKGS.txt
 fi
+    cd $BIOC
 done
 
 # for i in ${pkg_type[@]}
