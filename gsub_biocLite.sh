@@ -1,7 +1,7 @@
 #!/bin/bash
-$1
-package='splatter'
-cd $package
+# 1 : package name and directory
+
+package=$1
 
 LITE_CALL="biocLite"
 BIOC_PKG="BiocInstaller"
