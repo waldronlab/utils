@@ -1,11 +1,10 @@
 #!/bin/bash
-# 1 - options: gsub, reset, push
+# 1 - options: gsub, reset, diff, push
 
 ## gsub - Run replacement script and bump package 'z' version
 ## reset - revert the package changes to most recent commit
-## push - push changes to git.bioc
 ## diff - see changes with git diff
-
+## push - push changes to git.bioc
 
 CMD=$1
 
