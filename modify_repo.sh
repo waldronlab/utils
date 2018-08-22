@@ -17,7 +17,7 @@ cd $BIOC
 readarray -t PKGS < $BIOC/$GIST_FOLDER/$LIST_FILE
 
 # testing
-for i in ${PKGS[@]:0:5}
+for i in ${PKGS[@]:0:1}
 
 # for i in ${PKGS[@]}
 do
@@ -25,11 +25,12 @@ do
 
     if [ "$CMD" == "gsub" ]; then
         $BIOC/utils/gsub_biocLite.sh $i
-        bash $BIOC/utils/version_bump.sh
+        $BIOC/utils/version_bump.sh
     elif [ "$CMD" == "reset" ]; then
         git checkout -- .
     elif [ "$CMD" == "push" ]; then
         git remote set-url origin git@git.bioconductor.org:packages/$i.git
+        git remote -v
         git commit -am "replace BiocInstaller biocLite mentions with BiocManager"
         git push
     elif [ "$CMD" == "diff" ]; then
