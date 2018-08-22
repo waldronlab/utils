@@ -17,9 +17,9 @@ cd $BIOC
 readarray -t PKGS < $BIOC/$GIST_FOLDER/$LIST_FILE
 
 # testing
-# for i in ${PKGS[@]:0:5}
+for i in ${PKGS[@]:0:5}
 
-for i in ${PKGS[@]}
+# for i in ${PKGS[@]}
 do
     cd $BIOC/git.bioconductor.org/software/$i
 
