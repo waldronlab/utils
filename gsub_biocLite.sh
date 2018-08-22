@@ -15,30 +15,31 @@ BIOCLITE_CALL_REGEXP="^\s*$LITE_CALL\(.*$package.*\)\s*$"
 
 library_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
 
+echo "Replacing BiocInstaller with BiocManager..."
+
 for i in $library_hits;
 do
-    echo "Replacing BiocInstaller with BiocManager..."
     sed -i "s/\<$BIOC_PKG\>/BiocManager/" $i
 done
 
 source_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$SOURCE_LINE_REGEXP" {} \+`
 
+echo "Replacing source(*/biocLite.R) with install.packages('BiocManager')"
 for i in $source_hits;
 do
-    echo "Replacing source(*/biocLite.R) with install.packages('BiocManager')"
     sed -E -i "s|$SOURCE_LINE_REGEXP|$BIOC_MGR|" $i
 done
 
 biocLite_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$BIOCLITE_CALL_REGEXP" {} \+`
 
+echo "Replacing biocLite() with BiocManager::install()"
 for i in $biocLite_hits;
 do
-    echo "Replacing biocLite() with BiocManager::install()"
     sed -i "s/\<$LITE_CALL\>/BiocManager::install/" $i
 done
 
 TOT_FILES="$library_hits $source_hits $biocLite_hits"
-TOTAL=`echo $TOT_FILES | tr " " "\n" | wc -l`
+TOTAL=`echo $TOT_FILES | tr " " "\n" | uniq | wc -l`
 
 echo "Done. $TOTAL file(s) modified."
 
