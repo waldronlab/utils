@@ -8,14 +8,14 @@
 
 CMD=$1
 
-cd $BIOC
-
-# GIST_FOLDER clone
-# git clone git@gist.github.com:44cc844a169d5d96c777a69037dae653.git
-
 BIOC='/data/16tb/Bioconductor'
 GIST_FOLDER='44cc844a169d5d96c777a69037dae653'
 LIST_FILE='software_BiocInstaller_biocLite_PKGS.txt'
+
+cd $BIOC
+
+# GIST_FOLDER clone
+# git clone git@gist.github.com:$GIST_FOLDER.git
 
 readarray -t PKGS < $BIOC/$GIST_FOLDER/$LIST_FILE
 
