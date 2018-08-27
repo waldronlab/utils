@@ -25,7 +25,10 @@ do
 
     if [ "$CMD" == "gsub" ]; then
         $BIOC/utils/gsub_biocLite.sh $i
-        $BIOC/utils/version_bump.sh
+        retVal=$?
+        if [ $retVal -ne 0 ]; then
+            $BIOC/utils/version_bump.sh
+        fi
     elif [ "$CMD" == "reset" ]; then
         git checkout -- .
     elif [ "$CMD" == "push" ]; then
