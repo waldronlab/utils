@@ -20,14 +20,14 @@ cd $BIOC
 readarray -t PKGS < $BIOC/$GIST_FOLDER/$LIST_FILE
 
 # testing
-for i in ${PKGS[@]:0:1}
+for i in ${PKGS[@]:0:6}
 
 # for i in ${PKGS[@]}
 do
     cd $BIOC/git.bioconductor.org/software/$i
 
     if [ "$CMD" == "gsub" ]; then
-        $BIOC/utils/gsub_biocLite.sh $i
+        $BIOC/utils/gsub_biocLite.sh
         retVal=$?
         if [ $retVal -ne 0 ]; then
             $BIOC/utils/version_bump.sh

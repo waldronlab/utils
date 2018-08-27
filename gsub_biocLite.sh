@@ -1,7 +1,4 @@
 #!/bin/bash
-# 1 : package name and directory
-
-package=$1
 
 LITE_CALL="biocLite"
 BIOC_INST="BiocInstaller"
@@ -12,7 +9,7 @@ BIOC_MGR="\1\2if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
 
 SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*$LITE_CALL\.R.*\)\`*\s*$"
 LIBRARY_LINE_REGEXP="^\s*library\(.*$BIOC_INST.*\)\s*$"
-BIOCLITE_CALL_REGEXP="^\s*$LITE_CALL\(.*$package.*\).*$"
+BIOCLITE_CALL_REGEXP="^\s*$LITE_CALL\(.*\).*$"
 
 library_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
 
