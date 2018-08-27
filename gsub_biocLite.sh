@@ -4,23 +4,27 @@
 package=$1
 
 LITE_CALL="biocLite"
-BIOC_PKG="BiocInstaller"
+BIOC_INST="BiocInstaller"
 SOURCE_FILES=".*\.[Rr]?[DdNnMmWw]*$"
+DESC_FILE="DESCRIPTION"
 BIOC_MGR="\1\2if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
     \1\2install.packages(\"BiocManager\")\2"
 
 SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*$LITE_CALL\.R.*\)\`*\s*$"
-LIBRARY_LINE_REGEXP="^\s*library\(.*$BIOC_PKG.*\)\s*$"
-BIOCLITE_CALL_REGEXP="^\s*$LITE_CALL\(.*$package.*\)\s*$"
+LIBRARY_LINE_REGEXP="^\s*library\(.*$BIOC_INST.*\)\s*$"
+BIOCLITE_CALL_REGEXP="^\s*$LITE_CALL\(.*$package.*\).*$"
 
 library_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
 
-echo "Replacing BiocInstaller with BiocManager..."
+echo "Replacing any BiocInstaller with BiocManager..."
 
 for i in $library_hits;
 do
-    sed -i "s/\<$BIOC_PKG\>/BiocManager/" $i
+    sed -i "s/\<$BIOC_INST\>/BiocManager/" $i
 done
+
+## for DESCRIPTION files
+sed -i "s/\<$BIOC_INST\>/BiocManager/" $DESC_FILE
 
 source_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$SOURCE_LINE_REGEXP" {} \+`
 
