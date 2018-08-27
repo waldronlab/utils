@@ -39,7 +39,12 @@ do
 done
 
 TOT_FILES="$library_hits $source_hits $biocLite_hits"
-TOTAL=`echo $TOT_FILES | tr " " "\n" | uniq | wc -l`
 
-echo "Done. $TOTAL file(s) modified."
+if [ -z "${TOT_FILES// }" ]; then
+    exit 0
+else
+    TOTAL=`echo $TOT_FILES | tr " " "\n" | uniq | wc -l`
+    echo "Done. $TOTAL file(s) modified."
+    exit 1
+fi
 
