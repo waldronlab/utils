@@ -25,6 +25,7 @@ PKGS=("${PKGS[@]/$EXCLUDE}")
 for i in ${PKGS[@]}
 do
     cd $BIOC/git.bioconductor.org/software/$i
+    echo "Working on package: $i..."
 
     if [ "$CMD" == "gsub" ]; then
         $BIOC/utils/gsub_biocLite.sh
@@ -38,9 +39,11 @@ do
         git remote set-url origin git@git.bioconductor.org:packages/$i.git
         git remote -v
         git commit -am "replace BiocInstaller biocLite mentions with BiocManager"
-        git push
+        git push origin master
     elif [ "$CMD" == "diff" ]; then
         git diff
+    elif [ "$CMD" == "status" ]; then
+        git status
     else
         echo "$CMD is not a valid option"
     fi
