@@ -12,8 +12,9 @@ do
     echo $locate
     ## Among all Bioconductor packages, what PACKAGES mention 'BiocInstaller'
     ## or 'biocLite'?
-    find . -type f -print0 | xargs -0 grep -E --exclude-dir={.git,data} \
-    --exclude={\.[Rr][Dd][AaSs],.[Rr][Dd]ata} 'BiocInstaller|biocLite' | \
+    find . -name '.git' -prune -o -type f -print0 | \
+    xargs -0 grep -E --exclude-dir="data" \
+    --exclude={\.[Rr][Dd][AaSs],\.[Rr][Dd]ata,\.git} 'BiocInstaller|biocLite' | \
     cut -d/ -f2 | sort | \
     uniq > $BIOC/$folder/${i}_BiocInstaller_biocLite_PKGS.txt
 
