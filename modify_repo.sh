@@ -1,16 +1,18 @@
 #!/bin/bash
-# 1 - options: gsub, reset, diff, push
+# 1 - options: software, data-experiment, workflows
+# 2 - options: gsub, reset, diff, push, status
 
 ## gsub - Run replacement script and bump package 'z' version
 ## reset - revert the package changes to most recent commit
 ## diff - see changes with git diff
 ## push - push changes to git.bioc
 
-CMD=$1
+pkg_type=$1
+CMD=$2
 
 BIOC='/data/16tb/Bioconductor'
 GIST_FOLDER='44cc844a169d5d96c777a69037dae653'
-LIST_FILE='software_BiocInstaller_biocLite_PKGS.txt'
+LIST_FILE="${pkg_type}_BiocInstaller_biocLite_PKGS.txt"
 EXCLUDE=(BiocInstaller)
 
 cd $BIOC
@@ -24,7 +26,7 @@ PKGS=("${PKGS[@]/$EXCLUDE}")
 
 for i in ${PKGS[@]}
 do
-    cd $BIOC/git.bioconductor.org/software/$i
+    cd $BIOC/git.bioconductor.org/$pkg_type/$i
     echo "Working on package: $i..."
 
     if [ "$CMD" == "gsub" ]; then
