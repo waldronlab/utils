@@ -1,6 +1,8 @@
 #!/bin/bash
 # 1 - options: software, data-experiment, workflows
 # 2 - options: gsub, reset, diff, push, status
+# 3 - (optional) package name(s)
+# 4 - (optional) commit message
 
 ## gsub - Run replacement script and bump package 'z' version
 ## reset - revert the package changes to most recent commit
@@ -9,6 +11,13 @@
 
 pkg_type=$1
 CMD=$2
+PKGS=$3
+
+if [ -z "${CMT_MSG// }" ]; then
+    CMT_MSG="replace BiocInstaller biocLite mentions with BiocManager"
+else
+    CMT_MSG=$4
+fi
 
 BIOC='/data/16tb/Bioconductor'
 GIST_FOLDER='44cc844a169d5d96c777a69037dae653'
@@ -20,7 +29,11 @@ cd $BIOC
 # GIST_FOLDER clone
 # git clone git@gist.github.com:$GIST_FOLDER.git
 
-readarray -t PKGS < $BIOC/$GIST_FOLDER/$LIST_FILE
+if [ -z "${PKGS// }" ]; then
+
+    readarray -t PKGS < $BIOC/$GIST_FOLDER/$LIST_FILE
+
+fi
 
 PKGS=("${PKGS[@]/$EXCLUDE}")
 
@@ -42,7 +55,7 @@ do
     elif [ "$CMD" == "push" ]; then
         git remote set-url origin git@git.bioconductor.org:packages/$i.git
         git remote -v
-        git commit -am "replace BiocInstaller biocLite mentions with BiocManager"
+        git commit -am "$CMT_MSG"
         git push origin master
     elif [ "$CMD" == "diff" ]; then
         git diff
