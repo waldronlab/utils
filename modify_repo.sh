@@ -31,11 +31,13 @@ do
 
     if [ "$CMD" == "gsub" ]; then
         $BIOC/utils/gsub_biocLite.sh
+        $BIOC/utils/BiocInstaller_alt.sh
         retVal=$?
         if [ $retVal -ne 0 ]; then
             $BIOC/utils/version_bump.sh
         fi
     elif [ "$CMD" == "reset" ]; then
+        echo "  Resetting changes to $i"
         git checkout -- .
     elif [ "$CMD" == "push" ]; then
         git remote set-url origin git@git.bioconductor.org:packages/$i.git

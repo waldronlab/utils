@@ -42,13 +42,5 @@ do
     sed -E -i "s|$BIOCLITE_CALL_REGEXP|\1$MGR_INST\2|" $i
 done
 
-TOT_FILES="$library_hits $source_hits $biocLite_hits"
-
-if [ -z "${TOT_FILES// }" ]; then
-    exit 0
-else
-    TOTAL=`echo $TOT_FILES | tr " " "\n" | uniq | wc -l`
-    echo "Done. $TOTAL file(s) modified."
-    exit 1
-fi
+LITE_FILES="$library_hits $source_hits $biocLite_hits"
 
