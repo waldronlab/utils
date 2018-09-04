@@ -6,11 +6,12 @@ SOURCE_FILES=".*\.[Rr]?[DdNnMmWw]*$"
 DESC_FILE="DESCRIPTION"
 BIOC_MGR="\1\2if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
     \1\2install.packages(\"BiocManager\")\2"
-MGR_INST="\1BiocManager::install\2"
+MGR_INST="BiocManager::install"
 
 SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*$LITE_CALL\.R.*\)\`*\s*$"
 LIBRARY_LINE_REGEXP="^\s*library\(.*$BIOC_INST.*\)\s*$"
-BIOCLITE_CALL_REGEXP="^(\s*)$LITE_CALL(\(.*\)*)$"
+FULL_CALL_REGEXP="$BIOC_INST::$LITE_CALL"
+BIOCLITE_CALL_REGEXP="(.*)$LITE_CALL(\(.*\)*)$"
 
 library_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
 
@@ -37,7 +38,8 @@ biocLite_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$BIOCLITE
 echo "Replacing biocLite() with BiocManager::install()"
 for i in $biocLite_hits;
 do
-    sed -E -i "s|$BIOCLITE_CALL_REGEXP|$MGR_INST|" $i
+    sed -i "s/\<$FULL_CALL_REGEXP\>/$MGR_INST/" $i
+    sed -E -i "s|$BIOCLITE_CALL_REGEXP|\1$MGR_INST\2|" $i
 done
 
 TOT_FILES="$library_hits $source_hits $biocLite_hits"
