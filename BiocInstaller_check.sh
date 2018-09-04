@@ -2,7 +2,12 @@
 
 BIOC="/data/16tb/Bioconductor/"
 
-pkg_type=( 'software' 'data-experiment' 'workflows' )
+pkg_type=$1
+
+if [ -z ${pkg_type// } ]; then
+    pkg_type=( 'software' 'data-experiment' 'workflows' )
+fi
+
 folder='44cc844a169d5d96c777a69037dae653'
 
 for i in ${pkg_type[@]}
@@ -13,8 +18,8 @@ do
     ## Among all Bioconductor packages, what PACKAGES mention 'BiocInstaller'
     ## or 'biocLite'?
     find . -name '.git' -prune -o -type f -print0 | \
-    xargs -0 grep -E --exclude-dir="data" \
-    --exclude={\.[Rr][Dd][AaSs],\.[Rr][Dd]ata,\.git} 'BiocInstaller|biocLite' | \
+    xargs -0 grep -EI --exclude-dir="data" \
+    --exclude={*\.[Rr][Dd][AaSs],*\.[Rr][Dd]ata,*\.txt} 'BiocInstaller|biocLite' | \
     cut -d/ -f2 | sort | \
     uniq > $BIOC/$folder/${i}_BiocInstaller_biocLite_PKGS.txt
 
