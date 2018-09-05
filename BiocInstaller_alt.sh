@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. $BIOC/utils/replace_biocLite.sh
+
 INST_REPOS="biocinstallRepos"
 BIOC_VALID="biocValid"
 BIOC_VERS="biocVersion"

@@ -19,7 +19,7 @@ else
     CMT_MSG=$4
 fi
 
-BIOC='/data/16tb/Bioconductor'
+export BIOC='/data/16tb/Bioconductor'
 GIST_FOLDER='44cc844a169d5d96c777a69037dae653'
 LIST_FILE="${pkg_type}_BiocInstaller_biocLite_PKGS.txt"
 EXCLUDE=( BiocInstaller AnnotationHub AnnotationHubData BiocCheck )
@@ -46,7 +46,6 @@ do
     echo "Working on package: $i..."
 
     if [ "$CMD" == "replace" ]; then
-        $BIOC/utils/replace_biocLite.sh
         $BIOC/utils/BiocInstaller_alt.sh
         retVal=$?
         if [ $retVal -ne 0 ]; then
