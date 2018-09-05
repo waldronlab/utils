@@ -36,7 +36,7 @@ if [ ! -z "${biocLite_hits// }" ]; then
 
     for i in $biocLite_hits;
     do
-        sed -E -i "s|$FULL_CALL_REGEXP|BiocManager\1$LITE_CALL|" $i
+        sed -E -i "s|$FULL_CALL_REGEXP|BiocManager\1install|" $i
         sed -E -i "s|$BIOCLITE_CALL_REGEXP|$MGR_INST(|g" $i
     done
 fi
