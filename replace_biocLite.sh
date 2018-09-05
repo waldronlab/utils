@@ -25,7 +25,6 @@ if [ ! -z "${library_hits// }" ]; then
     for i in $library_hits;
     do
         sed -E -i "s|$LIBRARY_LINE_REGEXP|\1BiocManager\2|g" $i
-        sed -i "s/BiocInstaller/BiocManager/g" $i
     done
 fi
 

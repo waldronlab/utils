@@ -18,7 +18,7 @@ if [ ! -z "${instrepos_hits// }" ]; then
     for i in $instrepos_hits;
     do
         sed -i "s/\<$INST_REPOS\>/repositories/" $i
-        sed -i "s/\<$BIOC_INST\>/BiocManager/" $i
+        sed -i "s/\<$BIOC_INST\>/BiocManager/g" $i
     done
 fi
 
