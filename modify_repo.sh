@@ -1,10 +1,10 @@
 #!/bin/bash
 # 1 - options: software, data-experiment, workflows
-# 2 - options: gsub, reset, diff, push, status
+# 2 - options: replace, reset, diff, push, status
 # 3 - (optional) package name(s)
 # 4 - (optional) commit message
 
-## gsub - Run replacement script and bump package 'z' version
+## replace - Run replacement script and bump package 'z' version
 ## reset - revert the package changes to most recent commit
 ## diff - see changes with git diff
 ## push - push changes to git.bioc
@@ -22,7 +22,7 @@ fi
 BIOC='/data/16tb/Bioconductor'
 GIST_FOLDER='44cc844a169d5d96c777a69037dae653'
 LIST_FILE="${pkg_type}_BiocInstaller_biocLite_PKGS.txt"
-EXCLUDE=(BiocInstaller)
+EXCLUDE=( BiocInstaller AnnotationHub AnnotationHubData )
 
 cd $BIOC
 
@@ -35,14 +35,17 @@ if [ -z "${PKGS// }" ]; then
 
 fi
 
-PKGS=("${PKGS[@]/$EXCLUDE}")
+for dex in ${EXCLUDE[@]}
+do
+    PKGS=("${PKGS[@]/$dex}")
+done
 
 for i in ${PKGS[@]}
 do
     cd $BIOC/git.bioconductor.org/$pkg_type/$i
     echo "Working on package: $i..."
 
-    if [ "$CMD" == "gsub" ]; then
+    if [ "$CMD" == "replace" ]; then
         $BIOC/utils/gsub_biocLite.sh
         $BIOC/utils/BiocInstaller_alt.sh
         retVal=$?
