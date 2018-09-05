@@ -9,13 +9,13 @@ BIOC_MGR="\1if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
 CODE_BIOCLITE="\1install.packages(\"BiocManager\")\2"
 MGR_INST="BiocManager::install"
 
-SOURCE_LINE_REGEXP="^([#\ \`]*)source\([\"']http.*$LITE_CALL\.R[\"']\)(.*)$"
+SOURCE_LINE_REGEXP="^([$># \`'\t]*)source\([\"']http.*$LITE_CALL\.R[\"']\)(.*)$"
 CODE_BIOCLITE_REGEXP="^(.*)source\([\"']http.*$LITE_CALL\.R[\"']\)(.*)$"
 
 # SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*$LITE_CALL\.R.*\)\`*\s*$"
-LIBRARY_LINE_REGEXP="^\s*library\(.*$BIOC_INST.*\)\s*$"
-FULL_CALL_REGEXP="$BIOC_INST[:|\ ]*$LITE_CALL"
-BIOCLITE_CALL_REGEXP="(.*)$LITE_CALL(\(.*)$"
+LIBRARY_LINE_REGEXP=".*(library\().*$BIOC_INST(.*)"
+FULL_CALL_REGEXP="$BIOC_INST([:| ]*)$LITE_CALL"
+BIOCLITE_CALL_REGEXP="$LITE_CALL\("
 
 library_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
 
@@ -24,7 +24,20 @@ if [ ! -z "${library_hits// }" ]; then
 
     for i in $library_hits;
     do
-        sed -i "s/\<$BIOC_INST\>/BiocManager/" $i
+        sed -E -i "s|$LIBRARY_LINE_REGEXP|\1BiocManager\2|g" $i
+        sed -i "s/BiocInstaller/BiocManager/g" $i
+    done
+fi
+
+biocLite_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$BIOCLITE_CALL_REGEXP" {} \+`
+
+if [ ! -z "${biocLite_hits// }" ]; then
+    echo "Replacing biocLite() with BiocManager::install()"
+
+    for i in $biocLite_hits;
+    do
+        sed -E -i "s|$FULL_CALL_REGEXP|BiocManager\1$LITE_CALL|" $i
+        sed -E -i "s|$BIOCLITE_CALL_REGEXP|$MGR_INST(|g" $i
     done
 fi
 
@@ -50,18 +63,6 @@ if [ ! -z "${code_hits// }" ]; then
     for i in $code_hits;
     do
         sed -E -i "s|$CODE_BIOCLITE_REGEXP|$CODE_BIOCLITE|" $i
-    done
-fi
-
-biocLite_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$BIOCLITE_CALL_REGEXP" {} \+`
-
-if [ ! -z "${biocLite_hits// }" ]; then
-    echo "Replacing biocLite() with BiocManager::install()"
-
-    for i in $biocLite_hits;
-    do
-        sed -i "s/\<$FULL_CALL_REGEXP\>/$MGR_INST/" $i
-        sed -E -i "s|$BIOCLITE_CALL_REGEXP|\1$MGR_INST\2|g" $i
     done
 fi
 
