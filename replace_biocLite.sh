@@ -9,12 +9,12 @@ BIOC_MGR="\1if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
 CODE_BIOCLITE="\1install.packages(\"BiocManager\")\2"
 MGR_INST="BiocManager::install"
 
-SOURCE_LINE_REGEXP="^([$># \`'\t]*)source\([\"']http.*$LITE_CALL\.R[\"']\)(.*)$"
+SOURCE_LINE_REGEXP="([$># \`'\t]*)source\([\"']http.*$LITE_CALL\.R[\"']\)(.*)$"
 CODE_BIOCLITE_REGEXP="^(.*)source\([\"']http.*$LITE_CALL\.R[\"']\)(.*)$"
 
 # SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*$LITE_CALL\.R.*\)\`*\s*$"
-LIBRARY_LINE_REGEXP=".*(library\().*$BIOC_INST(.*)"
-FULL_CALL_REGEXP="$BIOC_INST([:| ]*)$LITE_CALL"
+LIBRARY_LINE_REGEXP="(.*library\(.*)$BIOC_INST(.*)"
+FULL_CALL_REGEXP="(.*)$BIOC_INST([: ]*)$LITE_CALL(.*)"
 BIOCLITE_CALL_REGEXP="$LITE_CALL\("
 
 library_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
@@ -36,7 +36,7 @@ if [ ! -z "${biocLite_hits// }" ]; then
 
     for i in $biocLite_hits;
     do
-        sed -E -i "s|$FULL_CALL_REGEXP|BiocManager\1install|" $i
+        sed -E -i "s|$FULL_CALL_REGEXP|\1BiocManager\2install\3|" $i
         sed -E -i "s|$BIOCLITE_CALL_REGEXP|$MGR_INST(|g" $i
     done
 fi
