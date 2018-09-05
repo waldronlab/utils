@@ -10,9 +10,9 @@ SOURCE_FILES=".*\(\.R\|$NS\|\.[Rr][NnMm][WwDd]\|\.[Rr][Dd]\)"
 
 instrepos_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -wl "$INST_REPOS" {} \+`
 
-echo "Replacing any biocinstallRepos with BiocManager::repositories..."
-
 if [ ! -z "${instrepos_hits// }" ]; then
+    echo "Replacing any biocinstallRepos with BiocManager::repositories..."
+
     for i in $instrepos_hits;
     do
         sed -i "s/\<$INST_REPOS\>/repositories/" $i
@@ -22,9 +22,10 @@ fi
 
 biocvalid_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -wl "$BIOC_VALID" {} \+`
 
-echo "Replacing any biocValid with BiocManager::valid..."
 
 if [ ! -z "${biocvalid_hits// }" ]; then
+    echo "Replacing any biocValid with BiocManager::valid..."
+
     for i in $biocvalid_hits;
     do
         sed -i "s/\<$BIOC_VALID\>/valid/" $i
@@ -33,9 +34,8 @@ fi
 
 biocvers_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -wl "$BIOC_VERS" {} \+`
 
-echo "Replacing any biocVersion with BiocManager::version"
-
 if [ ! -z "${biocvers_hits// }" ]; then
+    echo "Replacing any biocVersion with BiocManager::version"
     for i in $biocvers_hits;
     do
         sed -i "s/\<$BIOC_VERS\>/valid/" $i
