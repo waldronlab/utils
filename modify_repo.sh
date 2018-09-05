@@ -46,7 +46,7 @@ do
     echo "Working on package: $i..."
 
     if [ "$CMD" == "replace" ]; then
-        $BIOC/utils/gsub_biocLite.sh
+        $BIOC/utils/replace_biocLite.sh
         $BIOC/utils/BiocInstaller_alt.sh
         retVal=$?
         if [ $retVal -ne 0 ]; then
