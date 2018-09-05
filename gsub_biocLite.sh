@@ -4,14 +4,18 @@ LITE_CALL="biocLite"
 BIOC_INST="BiocInstaller"
 SOURCE_FILES=".*\.[Rr]?[DdNnMmWw]*$"
 DESC_FILE="DESCRIPTION"
-BIOC_MGR="\1\2if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
-    \1\2install.packages(\"BiocManager\")\2"
+BIOC_MGR="\1if (!requireNamespace(\"BiocManager\", quietly=TRUE))\2\\
+    \1install.packages(\"BiocManager\")\2"
+CODE_BIOCLITE="\1install.packages(\"BiocManager\")\2"
 MGR_INST="BiocManager::install"
 
-SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*$LITE_CALL\.R.*\)\`*\s*$"
+SOURCE_LINE_REGEXP="^([#\ \`]*)source\([\"']http.*$LITE_CALL\.R[\"']\)(.*)$"
+CODE_BIOCLITE_REGEXP="^(.*)source\([\"']http.*$LITE_CALL\.R[\"']\)(.*)$"
+
+# SOURCE_LINE_REGEXP="^(\s*)(\`)*source\(.*http.*$LITE_CALL\.R.*\)\`*\s*$"
 LIBRARY_LINE_REGEXP="^\s*library\(.*$BIOC_INST.*\)\s*$"
-FULL_CALL_REGEXP="$BIOC_INST::$LITE_CALL"
-BIOCLITE_CALL_REGEXP="(.*)$LITE_CALL(\(.*\)*)$"
+FULL_CALL_REGEXP="$BIOC_INST[:|\ ]*$LITE_CALL"
+BIOCLITE_CALL_REGEXP="(.*)$LITE_CALL(\(.*)$"
 
 library_hits=`find . ! -path . -regex "$SOURCE_FILES" -exec grep -El "$LIBRARY_LINE_REGEXP" {} \+`
 
