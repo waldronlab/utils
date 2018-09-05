@@ -65,5 +65,5 @@ if [ ! -z "${biocLite_hits// }" ]; then
     done
 fi
 
-LITE_FILES="$library_hits $source_hits $biocLite_hits"
+export LITE_FILES="$library_hits $source_hits $biocLite_hits"
 
