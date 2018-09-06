@@ -40,7 +40,7 @@ if [ ! -z "${biocvers_hits// }" ]; then
     echo "Replacing any biocVersion with BiocManager::version"
     for i in $biocvers_hits;
     do
-        sed -i "s/\<$BIOC_VERS\>/valid/" $i
+        sed -i "s/\<$BIOC_VERS\>/version/" $i
     done
 fi
 
