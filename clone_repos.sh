@@ -15,12 +15,18 @@ export BIOC="/data/16tb/Bioconductor/"
 
 cd $BIOC
 
-# clone software package repos (takes approx. 1h10)
-time $BBS_HOME/utils/update_bioc_git_repos.py software master
+## TODO: handle arrays
 
-# clone data-experiment package repos (takes approx. 1h45)
-time $BBS_HOME/utils/update_bioc_git_repos.py data-experiment master
+if [ "$pkg_type" == "software" ]; then
+    # clone software package repos (takes approx. 1h10)
+    time $BBS_HOME/utils/update_bioc_git_repos.py software master
 
-# clone workflow package repos (takes approx. 4 min)
-time $BBS_HOME/utils/update_bioc_git_repos.py workflows master
+elif [ "$pkg_type" == "data-experiment" ]; then
+    # clone data-experiment package repos (takes approx. 1h45)
+    time $BBS_HOME/utils/update_bioc_git_repos.py data-experiment master
+
+elif [ "$pkg_type" == "workflows" ]; then
+    # clone workflow package repos (takes approx. 4 min)
+    time $BBS_HOME/utils/update_bioc_git_repos.py workflows master
+fi
 
