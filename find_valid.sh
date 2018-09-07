@@ -46,11 +46,11 @@ do
     echo "Working on package: $i..."
 
     if [ "$CMD" == "search" ]; then
-        git show HEAD~3
+        git log -n 3 -p --author="LiNk-NY"
     elif [ "$CMD" == "line" ]; then
-        git show HEAD~3 | grep -E "valid|biocVersion"
+        git log -n 3 -p --author="LiNk-NY" | grep -E "valid|biocVersion"
     elif [ "$CMD" == "package" ]; then
-        nlines=`git show HEAD~3 | grep -E "valid|biocVersion" | wc -l` 
+        nlines=`git log -n 3 -p --author="LiNk-NY" | grep -E "valid|biocVersion" | wc -l`
         if [ "$nlines" -gt 0 ]; then
             echo ${i}
         fi
