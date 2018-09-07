@@ -14,7 +14,7 @@ CMD=$2
 PKGS=$3
 
 if [ -z "${CMT_MSG// }" ]; then
-    CMT_MSG="replace BiocInstaller biocLite mentions with BiocManager"
+    CMT_MSG="additional updates from BiocInstaller to BiocManager"
 else
     CMT_MSG=$4
 fi
