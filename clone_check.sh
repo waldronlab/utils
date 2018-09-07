@@ -2,7 +2,7 @@
 
 PKGNAME=$1
 
-git clone git@git.bioconductor.org:packages/$PKGNAME.git && cd $PKG
+git clone git@git.bioconductor.org:packages/$PKGNAME.git && cd $PKGNAME
 
 find . -name '.git' -type d -prune \
     -o -name 'data' -type d -prune \
