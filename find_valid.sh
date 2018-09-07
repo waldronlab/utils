@@ -1,6 +1,6 @@
 #!/bin/bash
 # 1 - package name (if none, taken from list in gist)
-# 2 - options: search, line
+# 2 - options: search, line, package
 
 ## search - look at previous commit histories for packages
 ## line - find what line includes "valid"
@@ -8,13 +8,14 @@
 
 PKGS=$1
 CMD=$2
+pkg_type=software
 
 BIOC="/data/16tb/Bioconductor/"
 GIST_FOLDER='44cc844a169d5d96c777a69037dae653'
-LIST_FILE="software_valid_PKGS.txt"
+LIST_FILE="${pkg_type}_valid_PKGS.txt"
 EXCLUDE=( BiocInstaller AnnotationHub AnnotationHubData BiocCheck )
 
-LOC=$BIOC/git.bioconductor.org/software
+LOC=$BIOC/git.bioconductor.org/$pkg_type
 cd $LOC
 echo $LOC
 
