@@ -46,7 +46,7 @@ do
     echo "Working on package: $i..."
 
     if [ "$CMD" == "replace" ]; then
-        $BIOC/utils/BiocInstaller_alt.sh
+        $BIOC/utils/replace_alt_keywords.sh
         retVal=$?
         if [ $retVal -ne 0 ]; then
             $BIOC/utils/version_bump.sh
