@@ -10,10 +10,10 @@ PKGS=$1
 CMD=$2
 pkg_type=software
 
-BIOC="/data/16tb/Bioconductor/"
-GIST_FOLDER='44cc844a169d5d96c777a69037dae653'
 LIST_FILE="${pkg_type}_valid_PKGS.txt"
 EXCLUDE=( BiocInstaller AnnotationHub AnnotationHubData BiocCheck )
+
+. ./utils/setBIOC.sh
 
 LOC=$BIOC/git.bioconductor.org/$pkg_type
 cd $LOC

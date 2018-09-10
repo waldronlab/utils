@@ -19,8 +19,8 @@ else
     CMT_MSG=$4
 fi
 
-export BIOC='/data/16tb/Bioconductor'
-GIST_FOLDER='44cc844a169d5d96c777a69037dae653'
+. ./utils/setBIOC.sh
+
 LIST_FILE="${pkg_type}_BiocInstaller_biocLite_PKGS.txt"
 EXCLUDE=( BiocInstaller AnnotationHub AnnotationHubData BiocCheck )
 

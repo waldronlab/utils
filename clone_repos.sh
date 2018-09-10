@@ -3,15 +3,13 @@
 # eval "$(ssh-agent -s)"
 # ssh-add
 
+. ./utils/setBIOC.sh
+
 pkg_type=$1
 
 if [ -z ${pkg_type// } ]; then
     pkg_type=( 'software' 'data-experiment' 'workflows' )
 fi
-
-export BBS_HOME="/data/16tb/Bioconductor/BBS"
-export PYTHONPATH="$BBS_HOME/bbs"
-export BIOC="/data/16tb/Bioconductor/"
 
 cd $BIOC
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BIOC="/data/16tb/Bioconductor/"
+. ./utils/setBIOC.sh
 
 pkg_type=$1
 
