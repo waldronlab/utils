@@ -9,9 +9,15 @@ do
     R_LOC=$HOME/src/svn/r-${name}/R/bin/R
     LIB_DIR=$HOME/src/lib/r-${name}/
     TAR_LOC=$HOME/src/tar/r-${name}/
-    if [ ! -d $lib_dir ]; then
-        mkdir -p $lib_dir
+
+    if [ ! -d $LIB_DIR ]; then
+        mkdir -p $LIB_DIR
     fi
+
+    if [ ! -d $TAR_LOC ]; then
+        mkdir -p $TAR_LOC
+    fi
+
     echo "Testing $pkg on r-${name}..."
     cd $TAR_LOC
     R_LIBS_USER=$LIB_DIR $R_LOC --vanilla CMD build --no-build-vignettes $pkg_dir
@@ -20,10 +26,10 @@ do
     retVal=$?
         if [ $retVal -ne 0 ]; then
             INSTOUT=$TAR_LOC/${pkg}.Rcheck/00check.log
-            R_LOC -e "
+            $R_LOC -e "
             rlines <- readLines('${INSTOUT}')
             lpkgs <- grep('Packages suggested but not available:', rlines)+1L
-            inpkgs <- unlist(strsplit(rlines[lpkgs], ','))
+            inpkgs <- gsub(\" |'\", '', unlist(strsplit(rlines[lpkgs], \"', '\")))
             BiocManager::install(inpkgs, ask = FALSE)
             "
             R_LIBS_USER=$LIB_DIR $R_LOC --vanilla CMD check $TAR_LOC/${pkg}_*.tar.gz
