@@ -4,7 +4,7 @@ pkg=$1
 cwd=$(pwd)
 pkg_dir=$cwd/$pkg
 
-for name in devel release oldrel
+for name in oldrel release devel
 do
     R_LOC=$HOME/src/svn/r-${name}/R/bin/R
     LIB_DIR=$HOME/src/lib/r-${name}/
@@ -18,11 +18,11 @@ do
         mkdir -p $TAR_LOC
     fi
 
-    echo "Testing $pkg on r-${name}..."
+    echo "-*-*- Testing $pkg on r-${name}..."
     cd $TAR_LOC
     export R_LIBS_USER=$LIB_DIR
     $R_LOC --vanilla CMD build --no-build-vignettes $pkg_dir
-    echo "Checking $pkg on r-${name}"
+    echo "-*-*- Checking $pkg on r-${name}"
     $R_LOC --vanilla CMD check $TAR_LOC/${pkg}_*.tar.gz
     retVal=$?
         if [ $retVal -ne 0 ]; then
@@ -30,7 +30,8 @@ do
             $R_LOC --vanilla -e "
             rlines <- readLines('${INSTOUT}')
             lpkgs <- grep('Packages suggested but not available:', rlines)+1L
-            inpkgs <- gsub(\" |'\", '', unlist(strsplit(rlines[lpkgs], \"', '\")))
+            inpkgs <- gsub(\"[ '\u2018\u2019]\", '', unlist(strsplit(rlines[lpkgs], '[, ]')))
+            inpkgs <- Filter(function(ch) nchar(ch), inpkgs)
             install.packages('BiocManager', repos = 'https://cloud.r-project.org/')
             BiocManager::install(inpkgs, ask = FALSE)
             "
