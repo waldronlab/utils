@@ -1,18 +1,37 @@
 #!/bin/bash
 
 pkg=$1
+cwd=$(pwd)
+pkg_dir=$cwd/$pkg
 
 for name in devel release oldrel
 do
     R_LOC=$HOME/src/svn/r-${name}/R/bin/R
-    LIB_DIR=$HOME/src/lib/r-${name}
+    LIB_DIR=$HOME/src/lib/r-${name}/
+    TAR_LOC=$HOME/src/tar/r-${name}/
     if [ ! -d $lib_dir ]; then
         mkdir -p $lib_dir
     fi
     echo "Testing $pkg on r-${name}..."
-    R_LIBS_USER=$LIB_DIR $R_LOC --vanilla CMD build $pkg
+    cd $TAR_LOC
+    R_LIBS_USER=$LIB_DIR $R_LOC --vanilla CMD build --no-build-vignettes $pkg_dir
     echo "Checking $pkg on r-${name}"
-    R_LIBS_USER=$LIB_DIR $R_LOC --vanilla CMD check ${pkg}_*.tar.gz
+    R_LIBS_USER=$LIB_DIR $R_LOC --vanilla CMD check $TAR_LOC/${pkg}_*.tar.gz
+    retVal=$?
+        if [ $retVal -ne 0 ]; then
+            INSTOUT=$TAR_LOC/${pkg}.Rcheck/00check.log
+            R_LOC -e "
+            rlines <- readLines('${INSTOUT}')
+            lpkgs <- grep('Packages suggested but not available:', rlines)+1L
+            inpkgs <- unlist(strsplit(rlines[lpkgs], ','))
+            BiocManager::install(inpkgs, ask = FALSE)
+            "
+            R_LIBS_USER=$LIB_DIR $R_LOC --vanilla CMD check $TAR_LOC/${pkg}_*.tar.gz
+            if [ $? -ne 0 ]; then
+                echo "Unable to install necessary dependencies"
+                exit 2
+            fi
+        fi
 done
 
 
