@@ -22,27 +22,14 @@ do
     cd $TAR_LOC
     export R_LIBS_USER=$LIB_DIR
     $R_LOC --vanilla CMD build --no-build-vignettes $pkg_dir
+    echo "-*-*- Installing $pkg dependencies for r-${name}"
+    $R_LOC --vanilla -e "dcf <- read.dcf('${pkg_dir}/DESCRIPTION', 'Suggests'); pkgs <- trimws(strsplit(dcf, \"[,\n ]+\")[[1L]]); need <- pkgs[!pkgs %in% rownames(installed.packages())]; install.packages('BiocManager', repos = 'https://cloud.r-project.org/'); BiocManager::install(need, ask = FALSE)"
     echo "-*-*- Checking $pkg on r-${name}"
     $R_LOC --vanilla CMD check $TAR_LOC/${pkg}_*.tar.gz
-    retVal=$?
-        if [ $retVal -ne 0 ]; then
-            INSTOUT=$TAR_LOC/${pkg}.Rcheck/00check.log
-            $R_LOC --vanilla -e "
-            rlines <- readLines('${INSTOUT}')
-            lpkgs <- grep('Packages suggested but not available:', rlines)+1L
-            inpkgs <- gsub(\"[ '\u2018\u2019]\", '', unlist(strsplit(rlines[lpkgs], '[, ]')))
-            inpkgs <- Filter(function(ch) nchar(ch), inpkgs)
-            install.packages('BiocManager', repos = 'https://cloud.r-project.org/')
-            BiocManager::install(inpkgs, ask = FALSE)
-            "
-            $R_LOC --vanilla CMD check $TAR_LOC/${pkg}_*.tar.gz
-            if [ $? -ne 0 ]; then
-                echo "Unable to install necessary dependencies"
-                exit 2
-            fi
-        fi
     export R_LIBS_USER=""
+    if [ $? -ne 0 ]; then
+        echo "Unable to check package without errors"
+        exit 2
+    fi
 done
-
-
 
