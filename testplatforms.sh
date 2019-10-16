@@ -37,10 +37,9 @@ do
 
     if [ $? -ne 0 ]; then
         echo "Unable to check package without errors"
+        echo "** Removing tarball... rm ${TARBALL}"
+        rm ${TARBALL}
         exit 2
     fi
-
-    echo "** Removing tarball... rm ${TARBALL}"
-    rm ${TARBALL}
-
 done
+
