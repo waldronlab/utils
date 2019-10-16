@@ -2,12 +2,13 @@
 
 pkg=$1
 cwd=$(pwd)
-pkg_dir=$cwd/$pkg
+pkg_dir="$cwd/$pkg"
+R_DIR="$HOME/R"
 
 for name in oldrel release devel
 do
     R_LOC=$HOME/src/svn/r-${name}/R/bin/R
-    LIB_DIR=$HOME/src/lib/r-${name}/
+    LIB_DIR=$R_DIR/r-${name}/
     TAR_LOC=$HOME/src/tar/r-${name}/
 
     if [ ! -d $LIB_DIR ]; then
