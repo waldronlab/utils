@@ -26,6 +26,7 @@ do
     ${rversion} -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr'); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps)"
 
     cd $LIBLOC
+    rm -rf ${PKG}_*
 
     echo "** ${rversion} CMD build $MGR"
     ${rversion} CMD build $MGR
