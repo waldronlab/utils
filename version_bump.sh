@@ -21,5 +21,5 @@ echo "==> $new_version_string ($action)"
 
 new_line="Version: $new_version_string"
 
-sed -i.bak "s/$old_line/$new_line/" "$desc_file"
+sed -i "s/$old_line/$new_line/" "$desc_file"
 
