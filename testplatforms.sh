@@ -23,7 +23,7 @@ do
 
     rversion="$HOME/src/svn/r-${rver}/R/bin/R --vanilla"
     
-    ${rversion} -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr'); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps)"
+    ${rversion} -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr'); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps, repos = 'https://cloud.r-project.org/')"
 
     cd $LIBLOC
     rm -rf ${PKG}_*
