@@ -1,8 +1,9 @@
 #!/bin/bash
-# 1 - git address - git@github.com:Bioconductor/Organism.dplyr.git
+# clone GitHub and Bioc.git repositories
 
-pkg_ssh=$1
-PKG=`echo $pkg_ssh | cut -d/ -f2 | rev | cut -d. -f2- | rev`
+# 1 - package name
+
+PKG=$1
 
 git clone git@github.com:Bioconductor/$PKG.git && cd $PKG
 
