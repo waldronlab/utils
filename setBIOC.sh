@@ -2,7 +2,7 @@
 
 ## set variables for scripts
 
-export BIOC="/home/ubuntu/Bioconductor/"
+export BIOC="$HOME/bioc"
 # export BIOC="/data/16tb/Bioconductor/"
 export BBS_HOME="$BIOC/BBS"
 export PYTHONPATH="$BBS_HOME/bbs"

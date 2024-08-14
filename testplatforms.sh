@@ -5,7 +5,7 @@ PKG='BiocManager'
 MGR="$HOME/bioc/$PKG"
 
 if [ -z "${version// }" ]; then
-    version=( "4-2" "4-3" "devel" )
+    version=( "4-3" "4-4" "devel" )
 else
     version=( $1 )
 fi
@@ -21,7 +21,7 @@ do
     rversion="$HOME/src/svn/r-${rver}/R/bin/R --vanilla"
     
     R_LIBS_USER="$HOME/R/r-${rver}" \
-    ${rversion} -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr', 'rmarkdown'); options(Ncpus = 24); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps, repos = 'https://cloud.r-project.org/')"
+    ${rversion} -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr', 'rmarkdown', 'bookdown', 'BiocManager'); options(Ncpus = 24); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps, repos = 'https://cloud.r-project.org/'); setRepositories(ind = 2); install.packages('BiocStyle')"
 
     cd $R_LIBS_USER
     rm -rf ${PKG}_*
