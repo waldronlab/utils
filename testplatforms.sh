@@ -26,6 +26,13 @@ do
     cd $R_LIBS_USER
     rm -rf ${PKG}_*
 
+    echo "** ${rversion} CMD INSTALL $MGR"
+
+    R_LIBS_USER="$HOME/R/r-${rver}" ${rversion} CMD INSTALL $MGR
+
+    R_LIBS_USER="$HOME/R/r-${rver}" \
+    ${rversion} -e "if(!require('BiocStyle', quietly = TRUE)) BiocManager::install('BiocStyle')"
+
     echo "** ${rversion} CMD build $MGR"
 
     R_LIBS_USER="$HOME/R/r-${rver}" ${rversion} CMD build $MGR
