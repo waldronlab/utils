@@ -23,4 +23,5 @@ new_line="Version: $new_version_string"
 
 sed -i "s/$old_line/$new_line/" "$desc_file"
 
-git commit -am "version bump $new_version_string"
+git add $desc_file
+git commit -m "version bump $new_version_string"
