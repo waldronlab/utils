@@ -1,35 +1,33 @@
 #!/bin/bash
 
-# eval "$(ssh-agent -s)"
-# ssh-add
+branch=$1
 
-. ./utils/setBIOC.sh
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
 
-pkg_type=$1
-
-if [ -z ${pkg_type// } ]; then
-    pkg_type=( 'software' 'data-experiment' 'workflows' )
-fi
+BIOC="$HOME/bioc"
+REPO_BASE=git@git.bioconductor.org
 
 cd $BIOC
 
-for item in "${pkg_type[@]}"; do
+git clone git@git.bioconductor.org:admin/manifest
+git checkout $branch origin/$branch
 
-    if [ "$item" == "software" ]; then
-        # clone software package repos (takes approx. 1h10)
-        time $BBS_HOME/utils/update_bioc_git_repos.py software devel
+cd manifest
+
+PACKAGES=(
+    $(grep "^Package:" software.txt | cut -d: -f2 | tr -d ' ')
+)
+
+cd ..
+
+for pkg in "${PACKAGES[@]}"
+do
+    echo "Attempting to clone $pkg..."
+    if [ ! -d "$BIOC/$pkg" ]; then
+        git clone $REPO_BASE:packages/$pkg.git
+    else
+        cd $BIOC/$pkg && git pull origin $branch
     fi
-
-    if [ "$item" == "data-experiment" ]; then
-        # clone data-experiment package repos (takes approx. 1h45)
-        time $BBS_HOME/utils/update_bioc_git_repos.py data-experiment devel
-    fi
-
-    if [ "$item" == "workflows" ]; then
-        # clone workflow package repos (takes approx. 4 min)
-        time $BBS_HOME/utils/update_bioc_git_repos.py workflows devel
-    fi
-
 done
-
 
