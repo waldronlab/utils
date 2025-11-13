@@ -5,7 +5,7 @@ PKG='BiocManager'
 MGR="$HOME/bioc/$PKG"
 
 if [ -z "${version// }" ]; then
-    version=( "4-3" "4-4" "devel" )
+    version=( "4-4" "4-5" "devel" )
 else
     version=( $1 )
 fi
