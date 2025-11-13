@@ -18,30 +18,31 @@ do
         mkdir -p $R_LIBS_USER
     fi
 
-    rversion="$HOME/src/svn/r-${rver}/R/bin/R --vanilla"
-    
     R_LIBS_USER="$HOME/R/r-${rver}" \
-    ${rversion} -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr', 'rmarkdown', 'bookdown', 'BiocManager'); options(Ncpus = 24); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps, repos = 'https://cloud.r-project.org/'); setRepositories(ind = 2); install.packages('BiocStyle')"
+    "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr', 'rmarkdown', 'bookdown', 'BiocManager'); options(Ncpus = 24); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps, repos = 'https://cloud.r-project.org/'); setRepositories(ind = 2); install.packages('BiocStyle')"
+
+    R_LIBS_USER="$HOME/R/r-${rver}" \
+    "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla -e "if (packageVersion('testthat') < '3.3.0') remotes::install_github('r-lib/testthat')"
 
     cd $R_LIBS_USER
     rm -rf ${PKG}_*
 
-    echo "** ${rversion} CMD INSTALL $MGR"
+    echo "** $HOME/src/svn/r-${rver}/R/bin/R --vanilla CMD INSTALL $MGR"
 
-    R_LIBS_USER="$HOME/R/r-${rver}" ${rversion} CMD INSTALL $MGR
+    R_LIBS_USER="$HOME/R/r-${rver}" "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla CMD INSTALL $MGR
 
     R_LIBS_USER="$HOME/R/r-${rver}" \
-    ${rversion} -e "if(!require('BiocStyle', quietly = TRUE)) BiocManager::install('BiocStyle')"
+    "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla -e "if (!require('BiocStyle', quietly = TRUE)) BiocManager::install('BiocStyle')"
 
-    echo "** ${rversion} CMD build $MGR"
+    echo "** $HOME/src/svn/r-${rver}/R/bin/R --vanilla CMD build $MGR"
 
-    R_LIBS_USER="$HOME/R/r-${rver}" ${rversion} CMD build $MGR
+    R_LIBS_USER="$HOME/R/r-${rver}" "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla CMD build $MGR
 
     TARBALL=$(echo ${PKG}_*)
 
-    echo "** _R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_DEPENDS_ONLY=TRUE ${rversion} CMD check ${TARBALL}"
+    echo "** _R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_DEPENDS_ONLY=TRUE $HOME/src/svn/r-${rver}/R/bin/R --vanilla CMD check ${TARBALL}"
     R_LIBS_USER="$HOME/R/r-${rver}" \
-    _R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_DEPENDS_ONLY=TRUE ${rversion} CMD check --as-cran ${TARBALL}
+    _R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_DEPENDS_ONLY=TRUE "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla CMD check --as-cran ${TARBALL}
 
     if [ $? -ne 0 ]; then
         echo "Unable to check package without errors"
