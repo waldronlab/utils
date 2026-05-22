@@ -60,9 +60,9 @@ Most scripts assume a local Bioconductor working tree rooted at `~/bioc` and SSH
 Run scripts from your Bioconductor working directory context:
 
 ```bash
-bash /home/runner/work/utils/utils/find_list_packages.sh software
-bash /home/runner/work/utils/utils/fix_repos.sh software replace
-bash /home/runner/work/utils/utils/testplatforms.sh 4-5
+bash ./utils/find_list_packages.sh software
+bash ./utils/fix_repos.sh software replace
+bash ./utils/testplatforms.sh 4-5
 ```
 
 Some scripts source `./utils/setBIOC.sh`, so they expect to run from a directory where `utils/` is a direct child (commonly `~/bioc`).
