@@ -5,7 +5,7 @@ PKG='BiocManager'
 MGR="$HOME/bioc/$PKG"
 
 if [ -z "${version// }" ]; then
-    version=( "4-4" "4-5" "devel" )
+    version=( "4-5" "4-6" "devel" )
 else
     version=( $1 )
 fi
@@ -19,30 +19,30 @@ do
     fi
 
     R_LIBS_USER="$HOME/R/r-${rver}" \
-    "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr', 'rmarkdown', 'bookdown', 'BiocManager'); options(Ncpus = 24); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps, repos = 'https://cloud.r-project.org/'); setRepositories(ind = 2); install.packages('BiocStyle')"
+    "$HOME/src/svn/r-${rver}/inst/bin/R" --vanilla -e "deps <- c('knitr', 'testthat', 'remotes', 'stringr', 'rmarkdown', 'bookdown', 'BiocManager'); options(Ncpus = 24); if (!all(deps %in% rownames(installed.packages()))) install.packages(deps, repos = 'https://cloud.r-project.org/'); setRepositories(ind = 2); install.packages('BiocStyle')"
 
     R_LIBS_USER="$HOME/R/r-${rver}" \
-    "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla -e "if (packageVersion('testthat') < '3.3.0') remotes::install_github('r-lib/testthat')"
+    "$HOME/src/svn/r-${rver}/inst/bin/R" --vanilla -e "if (packageVersion('testthat') < '3.3.0') remotes::install_github('r-lib/testthat')"
 
     cd $R_LIBS_USER
     rm -rf ${PKG}_*
 
-    echo "** $HOME/src/svn/r-${rver}/R/bin/R --vanilla CMD INSTALL $MGR"
+    echo "** $HOME/src/svn/r-${rver}/inst/bin/R --vanilla CMD INSTALL $MGR"
 
-    R_LIBS_USER="$HOME/R/r-${rver}" "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla CMD INSTALL $MGR
+    R_LIBS_USER="$HOME/R/r-${rver}" "$HOME/src/svn/r-${rver}/inst/bin/R" --vanilla CMD INSTALL $MGR
 
     R_LIBS_USER="$HOME/R/r-${rver}" \
-    "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla -e "if (!require('BiocStyle', quietly = TRUE)) BiocManager::install('BiocStyle')"
+    "$HOME/src/svn/r-${rver}/inst/bin/R" --vanilla -e "if (!require('BiocStyle', quietly = TRUE)) BiocManager::install('BiocStyle')"
 
-    echo "** $HOME/src/svn/r-${rver}/R/bin/R --vanilla CMD build $MGR"
+    echo "** $HOME/src/svn/r-${rver}/inst/bin/R --vanilla CMD build $MGR"
 
-    R_LIBS_USER="$HOME/R/r-${rver}" "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla CMD build $MGR
+    R_LIBS_USER="$HOME/R/r-${rver}" "$HOME/src/svn/r-${rver}/inst/bin/R" --vanilla CMD build $MGR
 
     TARBALL=$(echo ${PKG}_*)
 
-    echo "** _R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_DEPENDS_ONLY=TRUE $HOME/src/svn/r-${rver}/R/bin/R --vanilla CMD check ${TARBALL}"
+    echo "** _R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_DEPENDS_ONLY=TRUE $HOME/src/svn/r-${rver}/inst/bin/R --vanilla CMD check ${TARBALL}"
     R_LIBS_USER="$HOME/R/r-${rver}" \
-    _R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_DEPENDS_ONLY=TRUE "$HOME/src/svn/r-${rver}/R/bin/R" --vanilla CMD check --as-cran ${TARBALL}
+    _R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_DEPENDS_ONLY=TRUE "$HOME/src/svn/r-${rver}/inst/bin/R" --vanilla CMD check --as-cran ${TARBALL}
 
     if [ $? -ne 0 ]; then
         echo "Unable to check package without errors"
