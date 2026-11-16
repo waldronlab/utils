@@ -1,10 +1,13 @@
 #!/bin/bash
 #
 # Increment the patch (z) component of the Version field in DESCRIPTION and
-# commit the change. With -c/--update-cff, also sync the top-level `version:`
-# key in CITATION.cff (or citation.cff).
+# commit the change. If CITATION.cff (or citation.cff) exists, its top-level
+# `version:` key is updated to match.
 #
-# usage: version_bump.sh [-c|--update-cff]
+# usage: version_bump.sh
+#
+# Environment:
+#   VERSION_BUMP_SKIP_CFF=1   leave CITATION.cff untouched (also true/yes)
 #
 # Portable across GNU and BSD (macOS) sed: edits are written to temp files
 # and only applied once every file has been rewritten and verified.
@@ -12,9 +15,12 @@
 set -euo pipefail
 
 desc_file="DESCRIPTION"
-update_cff=false
 
-usage() { echo "Usage: $0 [-c|--update-cff]" >&2; exit 1; }
+usage() {
+    echo "Usage: $0" >&2
+    echo "Set VERSION_BUMP_SKIP_CFF=1 to leave CITATION.cff untouched" >&2
+    exit 1
+}
 
 # Refuse to run if a file has uncommitted (staged or unstaged) edits;
 # otherwise they would be swept into the "version bump" commit
@@ -25,11 +31,23 @@ require_clean() {
     fi
 }
 
-case "${1:-}" in
-    -c|--update-cff) update_cff=true; shift ;;
-    -h|--help) usage ;;
-esac
 [[ $# -eq 0 ]] || usage
+
+skip_cff="$(echo "${VERSION_BUMP_SKIP_CFF:-}" | tr '[:upper:]' '[:lower:]')"
+case "$skip_cff" in
+    1|true|yes) update_cff=false ;;
+    ""|0|false|no) update_cff=true ;;
+    *)
+        echo "Invalid VERSION_BUMP_SKIP_CFF='$VERSION_BUMP_SKIP_CFF' (use 1/true/yes or 0/false/no)" >&2
+        exit 1
+        ;;
+esac
+
+# Prints "false" (exit 0) inside .git/, so compare the output
+if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" != true ]]; then
+    echo "Not inside a git working tree; run from a package repository" >&2
+    exit 1
+fi
 
 [[ -f "$desc_file" ]] || { echo "Missing $desc_file" >&2; exit 1; }
 require_clean "$desc_file"
@@ -79,9 +97,7 @@ if [[ "$update_cff" == true ]]; then
         fi
     done
 
-    if [[ -z "$cff_file" ]]; then
-        echo "Warning: no CITATION.cff found; updating $desc_file only" >&2
-    else
+    if [[ -n "$cff_file" ]]; then
         require_clean "$cff_file"
         # Only the top-level key (no indentation); nested keys such as
         # preferred-citation/references versions are left alone
