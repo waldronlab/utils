@@ -1,6 +1,14 @@
 #!/bin/bash
 
 desc_file="DESCRIPTION"
+
+# Refuse to run if DESCRIPTION has uncommitted (staged or unstaged) edits;
+# otherwise they would be swept into the "version bump" commit
+if ! git diff --quiet -- "$desc_file" || ! git diff --cached --quiet -- "$desc_file"; then
+    echo "$desc_file has uncommitted changes; commit or stash them first" >&2
+    exit 1
+fi
+
 old_line=`grep -E "^Version:" $desc_file`
 VERSION_LINE_REGEXP="^Version:[[:space:]]*([^[:space:]].*[^[:space:]])[[:space:]]*$"
 
