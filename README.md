@@ -48,8 +48,9 @@ Most scripts assume a local Bioconductor working tree rooted at `~/bioc` and SSH
   Builds/checks `BiocManager` across local old/release/devel R setups.
 - `anvil_test_all.sh`  
   Builds/checks AnVIL packages (`AnVILBase`, `AnVIL`, `AnVILGCP`, `AnVILAz`) using a local R install.
-- `version_bump.sh`  
+- `version_bump.sh [-c|--update-cff]`  
   Increments the patch component in `DESCRIPTION` (`Version:` line), commits the change.
+  With `-c`, also syncs the top-level `version:` in `CITATION.cff` (or `citation.cff`).
 - `tag_release.sh`  
   Example commands for manual git tag creation/push.
 - `dock.sh <release|tag>`  

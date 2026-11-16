@@ -1,35 +1,114 @@
 #!/bin/bash
+#
+# Increment the patch (z) component of the Version field in DESCRIPTION and
+# commit the change. With -c/--update-cff, also sync the top-level `version:`
+# key in CITATION.cff (or citation.cff).
+#
+# usage: version_bump.sh [-c|--update-cff]
+#
+# Portable across GNU and BSD (macOS) sed: edits are written to temp files
+# and only applied once every file has been rewritten and verified.
+
+set -euo pipefail
 
 desc_file="DESCRIPTION"
+update_cff=false
 
-# Refuse to run if DESCRIPTION has uncommitted (staged or unstaged) edits;
+usage() { echo "Usage: $0 [-c|--update-cff]" >&2; exit 1; }
+
+# Refuse to run if a file has uncommitted (staged or unstaged) edits;
 # otherwise they would be swept into the "version bump" commit
-if ! git diff --quiet -- "$desc_file" || ! git diff --cached --quiet -- "$desc_file"; then
-    echo "$desc_file has uncommitted changes; commit or stash them first" >&2
+require_clean() {
+    if ! git diff --quiet -- "$1" || ! git diff --cached --quiet -- "$1"; then
+        echo "$1 has uncommitted changes; commit or stash them first" >&2
+        exit 1
+    fi
+}
+
+case "${1:-}" in
+    -c|--update-cff) update_cff=true; shift ;;
+    -h|--help) usage ;;
+esac
+[[ $# -eq 0 ]] || usage
+
+[[ -f "$desc_file" ]] || { echo "Missing $desc_file" >&2; exit 1; }
+require_clean "$desc_file"
+
+n_version=$(grep -cE '^Version:' "$desc_file" || true)
+if [[ "$n_version" -ne 1 ]]; then
+    echo "Expected exactly one Version field in $desc_file, found $n_version" >&2
     exit 1
 fi
 
-old_line=`grep -E "^Version:" $desc_file`
-VERSION_LINE_REGEXP="^Version:[[:space:]]*([^[:space:]].*[^[:space:]])[[:space:]]*$"
+version_string=$(sed -nE 's/^Version:[[:space:]]*([^[:space:]]+)[[:space:]]*$/\1/p' "$desc_file")
 
-version_string=`echo $old_line | sed -r "s/$VERSION_LINE_REGEXP/\1/"`
+if [[ ! "$version_string" =~ ^([0-9]+)[.-]([0-9]+)[.-]([0-9]+)$ ]]; then
+    echo "Unsupported version format in $desc_file: '$version_string'" >&2
+    exit 1
+fi
 
-NB_REGEXP="(0|[1-9][0-9]*)"
-VERSION_REGEXP="^($NB_REGEXP)(\.|-)($NB_REGEXP)(\.|-)($NB_REGEXP)$"
+major="${BASH_REMATCH[1]}"
+minor="${BASH_REMATCH[2]}"
+patch="${BASH_REMATCH[3]}"
+# 10# forces base 10 so values like 07 or 09 are not read as octal
+new_patch=$((10#$patch + 1))
+new_version="$major.$minor.$new_patch"
+new_version_re="${new_version//./\\.}"
 
-x=`echo $version_string | sed -r "s/$VERSION_REGEXP/\1/"`
-y=`echo $version_string | sed -r "s/$VERSION_REGEXP/\4/"`
-z=`echo $version_string | sed -r "s/$VERSION_REGEXP/\7/"`
+echo "==> $new_version ($patch->$new_patch)"
 
-z=$((z+1))
-action="z->z+1"
+tmpdir=$(mktemp -d)
+trap 'rm -rf "$tmpdir"' EXIT
 
-new_version_string="$x.$y.$z"
-echo "==> $new_version_string ($action)"
+# Stage all edits in temp files first so a failure leaves the tree untouched
+sed -E "s/^Version:.*$/Version: $new_version/" "$desc_file" > "$tmpdir/desc"
+if ! grep -qE "^Version: $new_version_re$" "$tmpdir/desc"; then
+    echo "Failed to update version in $desc_file" >&2
+    exit 1
+fi
 
-new_line="Version: $new_version_string"
+files_to_commit=("$desc_file")
+cff_file=""
 
-sed -i "s/$old_line/$new_line/" "$desc_file"
+if [[ "$update_cff" == true ]]; then
+    # Match the real directory entry: `-f CITATION.cff` is true for
+    # citation.cff on case-insensitive filesystems (macOS), but git is not
+    for f in *.cff; do
+        if [[ -f "$f" && ( "$f" == CITATION.cff || "$f" == citation.cff ) ]]; then
+            cff_file="$f"; break
+        fi
+    done
 
-git add $desc_file
-git commit -m "version bump $new_version_string"
+    if [[ -z "$cff_file" ]]; then
+        echo "Warning: no CITATION.cff found; updating $desc_file only" >&2
+    else
+        require_clean "$cff_file"
+        # Only the top-level key (no indentation); nested keys such as
+        # preferred-citation/references versions are left alone
+        n_cff=$(grep -cE '^version:' "$cff_file" || true)
+        if [[ "$n_cff" -eq 0 ]]; then
+            echo "Warning: no top-level version field in $cff_file; skipping" >&2
+            cff_file=""
+        elif [[ "$n_cff" -gt 1 ]]; then
+            echo "Multiple top-level version fields in $cff_file" >&2
+            exit 1
+        else
+            # Keep any quoting and trailing comment as-is
+            sed -E "s/^version:([[:space:]]*)([\"']?)[^\"'#[:space:]]+([\"']?)(.*)$/version:\1\2$new_version\3\4/" \
+                "$cff_file" > "$tmpdir/cff"
+            if ! grep -qE "^version:[[:space:]]*[\"']?$new_version_re[\"']?([[:space:]]|$)" "$tmpdir/cff"; then
+                echo "Failed to update version in $cff_file" >&2
+                exit 1
+            fi
+            files_to_commit+=("$cff_file")
+        fi
+    fi
+fi
+
+# Apply (cat > preserves file mode and ownership)
+cat "$tmpdir/desc" > "$desc_file"
+if [[ -n "$cff_file" ]]; then cat "$tmpdir/cff" > "$cff_file"; fi
+
+git add -- "${files_to_commit[@]}"
+# Commit only these paths, even if other changes are staged
+git commit -m "version bump $new_version" -- "${files_to_commit[@]}"
