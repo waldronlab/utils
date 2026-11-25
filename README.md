@@ -57,6 +57,20 @@ Most scripts assume a local Bioconductor working tree rooted at `~/bioc` and SSH
 - `dock.sh <release|tag>`  
   Starts a Bioconductor Docker image with host library mounts.
 
+### Git helpers
+
+- `git_page.sh [-1] <start-commit> [end-ref]`  
+  Pages through commits with `git show`, oldest first, from `<start-commit>` (inclusive)
+  through `HEAD` or `end-ref`, one pager per commit (`q` for next, Ctrl-C to stop).
+  Use `-1` to view all commits in a single `git log -p` pager instead.
+- `git hist` (alias, not a script)  
+  Compact, colored commit graph across all branches (hash, refs, subject), handy for
+  picking a starting hash for `git_page.sh`. Set it up with:
+
+  ```bash
+  git config --global alias.hist 'log --graph --full-history --all --color --pretty=format:%x1b[31m%h%x09%x1b[32m%d%x1b[0m%x20%s'
+  ```
+
 ## Basic usage
 
 Run scripts from your Bioconductor working directory context:
